@@ -17,7 +17,7 @@ var fullname;
 fullname = 'ahmetzorlutuna';
 console.log(fullname);
 
-fullname = 'ahmetzorlutuna2';
+fullname = 'ahmetzorlutuna23';
 console.log(fullname);
 
 //Değişken tanımlama kuralları
