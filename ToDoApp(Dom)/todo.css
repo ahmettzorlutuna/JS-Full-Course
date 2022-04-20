@@ -1,0 +1,15 @@
+#header{
+    font-size: 45px;
+}
+a{
+    color: white;
+}
+.list-group-item{
+    margin-top: 10px;
+    background-color: #abd464;
+}
+.card-header{
+    text-align: center;
+    font-size: 20px;
+}
+
