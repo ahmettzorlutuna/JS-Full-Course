@@ -1,5 +1,5 @@
 body{
-    background-color: #292929;
+    background-color:rgb(48, 48, 48);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -83,4 +83,30 @@ h3{
 
 p.text span{
     color: darkorange;
+}
+
+#kaydet{
+    background-color: chocolate;
+    font-size: 20px;
+    border: none;
+    text-align: center;
+    padding: 4px  20px;
+    display: inline-block;
+    text-decoration: none;
+    border-radius: 6px;
+    align-items: center;
+    cursor: pointer;
+}
+
+#temizle{
+    background-color:firebrick;
+    font-size: 20px;
+    border: none;
+    text-align: center;
+    padding: 4px  20px;
+    display: inline-block;
+    text-decoration: none;
+    border-radius: 6px;
+    align-items: center;
+    cursor: pointer;
 }
