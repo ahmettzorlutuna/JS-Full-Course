@@ -1,7 +1,7 @@
 // Loops in Array & Objects
 
 //Arrays
-let cars = ['Alfa','Mercedes','Toyota'];
+let cars = ['Alfa','Mercedes','Toyota','Volswogen'];
 //Object
 let people = [
     {firstName:'Ahmet',lastName:'Zorlu'},
