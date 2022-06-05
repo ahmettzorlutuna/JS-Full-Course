@@ -38,3 +38,4 @@ function SorguyaÇek(isim) {
 
 var isim = SorguyaÇek('ahmet');
 isim('Tuna');
+
