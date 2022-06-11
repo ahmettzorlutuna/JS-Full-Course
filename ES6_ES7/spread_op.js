@@ -13,3 +13,4 @@ console.log(total.apply(null,numbers));
 
 //ES6
 console.log(total(...numbers));
+
