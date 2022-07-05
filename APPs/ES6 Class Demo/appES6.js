@@ -112,7 +112,7 @@ UI.prototype.showAlert = function (message, type) {
 
     const row = document.querySelector('.row');
     //beforeBegin, afterBegin, beforeEnd, afterEnd **Parametreler
-    row.insertAdjacentHTML('beforeBegin', alert); //row elementinden önce alert html etiketini ekler.
+    row.insertAdjacentHTML('beforeBegin', alert); //row inden önce alert html etiketini ekler.
 
     setTimeout(() => {
         document.querySelector('.alert').remove();
