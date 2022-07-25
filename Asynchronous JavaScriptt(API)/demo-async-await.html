@@ -69,7 +69,7 @@
             console.log(lat,long);
 
             //api, google, opencagedata
-            const api_key = "406de790c9eb4137b1198e57ad0f8994";
+            const api_key = "your_api_key";
             const url = `https://api.opencagedata.com/geocode/v1/json?q=${lat}+${long}&key=${api_key}`;
 
             const response = await fetch(url);
