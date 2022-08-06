@@ -2,6 +2,7 @@ class UI {
     constructor() {
         this.profileContainer = document.querySelector('#profileContainer');
         this.alert = document.querySelector('#alert');
+        this.todo = document.querySelector('#todo');
     }
 
 
@@ -38,12 +39,42 @@ class UI {
                                 webSite: ${profile.website}
                             </li>
                         </ul>
+                        <br>
                     </div>
+                    <h2 style="text-align: center;">TodoList</h2>
+                    <ul id="todo" class="list-group w-75">
+                        
+                    <ul>
                 </div>
             </div>
         
         `;
     }
+
+    showTodo(todo){
+        let html = "";
+
+        todo.forEach(todo => {
+            if(todo.completed){
+                html += `
+                <li class="list-group-item list-group-item-success fs-5">
+                    ${todo.title}
+                </li>
+            `;
+            }else{
+                html += `
+                <li class="list-group-item list-group-item-dark fs-5">
+                    ${todo.title}
+                </li>
+            `;
+            }
+
+            
+        });
+        
+
+        this.profileContainer.querySelector('#todo').innerHTML = html;
+    };
 
     showAlert(text) {
         this.alert.innerHTML = `

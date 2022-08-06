@@ -13,8 +13,17 @@ searchProfile.addEventListener('keyup',(event)=>{
                 ui.showAlert(text);
             }else{
                 ui.clearAlert();
-                ui.showProfile(res.profile[0]);   
+                // console.log("res");
+                // console.log(res.todo);
+                // for (let i = 0; i < res.todo.length; i++) {
+                //     console.log(res.todo[i].title);
+                // }
+                ui.showProfile(res.profile[0]); 
+                ui.showTodo(res.todo); 
+                  
             }
+         }).catch(error=>{
+            ui.showAlert(text);
          });
     }
 })
