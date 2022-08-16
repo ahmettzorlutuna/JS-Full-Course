@@ -1,11 +1,11 @@
 //1- Global variable naming conflicts
 //İsimlendirme Karışıklıkları
-//script.js
-// var name = 'Ahmet';
+script.js
+var name = 'Ahmet';
 
 // //app.js
-// var name = 'Ahmet2';
-// console.log(name);
+var name = 'Ahmet2';
+console.log(name);
 
 //2- Encapsulation
 
