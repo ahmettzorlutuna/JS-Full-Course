@@ -6,6 +6,39 @@ const StorageController = (function () {
 
 })();
 
+// async function getCurrentRate() {
+//     const api_key = "c736779b8afe6e31baef21be";
+//     const url = `https://v6.exchangerate-api.com/v6/${api_key}`;
+//     await fetch(url + "/latest/USD")
+//         .then(res => res.json())
+//         .then(data => {
+//             const selectors = UIController.getSelectors();
+//             const rateText = document.querySelector(selectors.currentRate);
+//             const rate = data.conversion_rates["TRY"];
+//             rateText.innerHTML = `Güncel Kur: ${rate.toFixed(2)}`
+//             return rate
+//         })
+// }
+
+const CurrentRate = (function () {
+    return {
+        getCurrentRate: function () {
+            const api_key = "c736779b8afe6e31baef21be";
+            const url = `https://v6.exchangerate-api.com/v6/${api_key}`;
+            fetch(url + "/latest/USD", )
+                .then(res => res.json())
+                .then(data => {
+                    const selectors = UIController.getSelectors();
+                    const rateText = document.querySelector(selectors.currentRate);
+                    const rate = data.conversion_rates["TRY"];
+                    rateText.innerHTML = `${rate.toFixed(2)}`
+                })
+                .then(rate=>{
+                    return rate
+                })
+        }
+    }
+})();
 
 //Product Controller
 const ProductController = (function () {
@@ -53,8 +86,11 @@ const ProductController = (function () {
                     total += prd.price;
                 }
             });
+            
             data.totalPrice = total;
-            return data.totalPrice
+            let formatted = new Intl.NumberFormat().format(data.totalPrice);
+
+            return formatted;
         },
         getProductById: function (id) {
             let product = null;
@@ -86,11 +122,17 @@ const ProductController = (function () {
 
             return product;
         },
-        deleteProduct: function(product){
-            data.products.forEach(function(prd,index){
-                if(prd.id == product.id){
+        deleteProduct: function (product) {
+            data.products.forEach(function (prd, index) {
+                if (prd.id == product.id) {
                     data.products.splice(index, 1);
                 }
+            })
+        },
+        deleteAllProduct: function () {
+            let lenght = data.products.length();
+            data.products.forEach(function () {
+                data.products.splice(1, lenght);
             })
         }
     }
@@ -106,6 +148,7 @@ const UIController = (function () {
         productListItems: "#item-list tr", //All tr items above item-list class
         saveButton: ".saveBtn",
         deleteButton: ".deleteBtn",
+        deleteAllButton: ".deleteAllBtn",
         cancelButton: ".cancelBtn",
         productList: "#item-list",
         productName: "#productName",
@@ -115,6 +158,7 @@ const UIController = (function () {
         totalUSD: "#total-dollar",
         tl: "#tl",
         usd: "#usd",
+        currentRate: ".current-rate"
 
     }
     return {
@@ -160,8 +204,10 @@ const UIController = (function () {
             document.querySelector(Selectors.productListHide).style.display = 'none';
         },
         showTotal: function (total) {
+            let rate = document.querySelector(Selectors.currentRate).textContent;
             document.querySelector(Selectors.totalTL).textContent = total + '$';
-            document.querySelector(Selectors.totalUSD).textContent = total * 18, 19;
+            document.querySelector(Selectors.totalUSD).textContent = `${total * rate} TL`;
+            
         },
         addProductToForm: function () {
             const selectedProduct = ProductController.getCurrentProduct();
@@ -174,7 +220,8 @@ const UIController = (function () {
             document.querySelector(Selectors.saveButton).style.display = 'none';
             document.querySelector(Selectors.deleteButton).style.display = 'none';
             document.querySelector(Selectors.cancelButton).style.display = 'none';
-            if(item){
+            document.querySelector(Selectors.deleteAllButton).style.display = 'none';
+            if (item) {
                 item.classList.remove('bg-info');
             }
         },
@@ -189,9 +236,10 @@ const UIController = (function () {
             document.querySelector(Selectors.saveButton).style.display = 'inline';
             document.querySelector(Selectors.deleteButton).style.display = 'inline';
             document.querySelector(Selectors.cancelButton).style.display = 'inline';
+            document.querySelector(Selectors.deleteAllButton).style.display = 'inline';
         },
         updateProduct: function (prd) {
-            let updatedItem=null;
+            let updatedItem = null;
 
             let items = document.querySelectorAll(Selectors.productListItems);
 
@@ -205,24 +253,30 @@ const UIController = (function () {
 
             return updatedItem;
         },
-        clearWarnings: function(){
+        clearWarnings: function () {
             let items = document.querySelectorAll(Selectors.productListItems);
 
-            items.forEach(item=>{
-                if(item.classList.contains('bg-info')){
+            items.forEach(item => {
+                if (item.classList.contains('bg-info')) {
                     item.classList.remove('bg-info');
                 }
             })
         },
-        deleteProduct: function(){
+        deleteProduct: function () {
             let items = document.querySelectorAll(Selectors.productListItems);
 
-            items.forEach(item=>{
-                if(item.classList.contains('bg-info')){
+            items.forEach(item => {
+                if (item.classList.contains('bg-info')) {
                     item.remove();
                 }
             })
-            
+        },
+        deleteAllProduct: function () {
+            let items = document.querySelectorAll(Selectors.productListItems)
+
+            items.forEach(item => {
+                item.remove();
+            })
         }
     }
 })();
@@ -246,7 +300,12 @@ const App = (function (ProductCtrl, UICtrl) {
         //Cancel product submit
         document.querySelector(UISelectors.cancelButton).addEventListener('click', cancelProductSubmit);
 
+        //Delete product submit
         document.querySelector(UISelectors.deleteButton).addEventListener('click', deleteProductSubmit);
+
+        //Delete all product submit
+        document.querySelector(UISelectors.deleteAllButton).addEventListener('click', deleteAllProductSubmit);
+
     }
 
     const addProducts = function (e) {
@@ -273,7 +332,7 @@ const App = (function (ProductCtrl, UICtrl) {
 
             //Clear İnputs
             UIController.clearList();
-            
+
         }
 
         e.preventDefault();
@@ -310,7 +369,7 @@ const App = (function (ProductCtrl, UICtrl) {
 
             //Update UI
             const item = UICtrl.updateProduct(updatedProduct);
-            
+
 
             //Get Total
             const total = ProductCtrl.getTotal();
@@ -324,13 +383,13 @@ const App = (function (ProductCtrl, UICtrl) {
         e.preventDefault();
     }
 
-    const cancelProductSubmit = function(e){
+    const cancelProductSubmit = function (e) {
         UIController.addingState();
         UIController.clearWarnings();
         e.preventDefault();
     }
 
-    const deleteProductSubmit = function(e){
+    const deleteProductSubmit = function (e) {
 
         //get selected product
         const selectedProduct = ProductCtrl.getCurrentProduct();
@@ -349,9 +408,18 @@ const App = (function (ProductCtrl, UICtrl) {
 
         UIController.addingState();
 
-        if(total==0){
+        if (total == 0) {
             UIController.hideCard();
         }
+
+        e.preventDefault();
+    }
+
+    const deleteAllProductSubmit = function (e) {
+        //Delete from product
+        ProductCtrl.deleteAllProduct();
+        //Delete from ui
+        UIController.deleteAllProduct();
 
         e.preventDefault();
     }
@@ -373,13 +441,11 @@ const App = (function (ProductCtrl, UICtrl) {
                 console.log("card gizlendi")
             }
 
-
-
-
+            //getCurrentRate();
+            CurrentRate.getCurrentRate();
 
 
             data = ProductCtrl.getData();
-            console.log(data.totalPrice);
             loadEventListeners();
         }
     }
