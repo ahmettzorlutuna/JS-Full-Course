@@ -23,7 +23,7 @@ const StorageController = (function () {
 const CurrentRate = (function () {
     return {
         getCurrentRate: function () {
-            const api_key = "your_api_key";
+            const api_key = "your_api_keyyyyyasdasd";
             const url = `https://v6.exchangerate-api.com/v6/${api_key}`;
             fetch(url + "/latest/USD", )
                 .then(res => res.json())
