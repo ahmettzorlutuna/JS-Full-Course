@@ -3,26 +3,46 @@
 
 //Storage Controller
 const StorageController = (function () {
-    return{
-        storeProduct: function(product){
+    return {
+        storeProduct: function (product) {
             let products;
-            if(localStorage.getItem('products')===null){
+            if (localStorage.getItem('products') === null) {
                 products = [];
                 products.push(product)
-            }else{
+            } else {
                 products = JSON.parse(localStorage.getItem('products')); //Json stringini parse ederek objeye çevirdik
                 products.push(product)
             }
-            localStorage.setItem('products',JSON.stringify(products)); //Objeyi local storage a eklemek için Json objesini string e çevirdik
+            localStorage.setItem('products', JSON.stringify(products)); //Objeyi local storage a eklemek için Json objesini string e çevirdik
         },
-        getProducts: function(product){
+        getProducts: function (product) {
             let products;
-            if(localStorage.getItem('products')=== null){
+            if (localStorage.getItem('products') === null) {
                 products = []
-            }else{
+            } else {
                 products = JSON.parse(localStorage.getItem('products'));
             }
             return products
+        },
+        updateProduct: function (updatedPr) {
+            let products = JSON.parse(localStorage.getItem('products'));
+
+            products.forEach(function (prd, index) {
+                if (prd.id == updatedPr.id) {
+                    products.splice(index, 1, updatedPr); //1 index sil product ı ekle
+                }
+            });
+            localStorage.setItem('products', JSON.stringify(products))
+        },
+        deleteProducts: function (id) {
+            let products = JSON.parse(localStorage.getItem('products'));
+
+            products.forEach(function (prd, index) {
+                if (id == prd.id) {
+                    products.splice(index, 1); //1 index sil product ı ekle
+                }
+            });
+            localStorage.setItem('products', JSON.stringify(products))
         }
     }
 })();
@@ -46,7 +66,7 @@ const CurrentRate = (function () {
         getCurrentRate: function () {
             const api_key = "c736779b8afe23fadc46gdca23hbxae31baef21be";
             const url = `https://v6.exchangerate-api.com/v6/${api_key}`;
-            fetch(url + "/latest/USD", )
+            fetch(url + "/latest/USD",)
                 .then(res => res.json())
                 .then(data => {
                     const selectors = UIController.getSelectors();
@@ -54,7 +74,7 @@ const CurrentRate = (function () {
                     const rate = data.conversion_rates["TRY"];
                     rateText.innerHTML = `${rate.toFixed(2)}`
                 })
-                .then(rate=>{
+                .then(rate => {
                     return rate
                 })
         }
@@ -106,7 +126,7 @@ const ProductController = (function () {
                     total += prd.price;
                 }
             });
-            
+
             data.totalPrice = total;
             let formatted = new Intl.NumberFormat().format(data.totalPrice);
 
@@ -232,7 +252,7 @@ const UIController = (function () {
             let rate = document.querySelector(Selectors.currentRate).textContent;
             document.querySelector(Selectors.totalTL).textContent = total + '$';
             document.querySelector(Selectors.totalUSD).textContent = `${total * rate} TL`;
-            
+
         },
         addProductToForm: function () {
             const selectedProduct = ProductController.getCurrentProduct();
@@ -340,7 +360,7 @@ const App = (function (ProductCtrl, UICtrl, StorageCtrl) {
         const ProdName = document.querySelector(UISelectors.productName).value;
         const ProdPrice = document.querySelector(UISelectors.productPrice).value;
         const productManufacturer = document.querySelector(UISelectors.productManufacturer).value;
-        
+
 
         //Adding prod to List
         if (ProdName != '' && ProdPrice != '' && productManufacturer) {
@@ -404,6 +424,8 @@ const App = (function (ProductCtrl, UICtrl, StorageCtrl) {
             //Update UI
             const item = UICtrl.updateProduct(updatedProduct);
 
+            //Update product to ls 
+            StorageCtrl.updateProduct(updatedProduct);
 
             //Get Total
             const total = ProductCtrl.getTotal();
@@ -430,6 +452,9 @@ const App = (function (ProductCtrl, UICtrl, StorageCtrl) {
 
         //delete product
         ProductCtrl.deleteProduct(selectedProduct);
+
+        //Delete from LS
+        StorageCtrl.deleteProducts(selectedProduct.id);
 
         //delete ui
         UIController.deleteProduct();
