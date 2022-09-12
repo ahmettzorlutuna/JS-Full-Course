@@ -3,11 +3,32 @@
 
 //Storage Controller
 const StorageController = (function () {
-
+    return{
+        storeProduct: function(product){
+            let products;
+            if(localStorage.getItem('products')===null){
+                products = [];
+                products.push(product)
+            }else{
+                products = JSON.parse(localStorage.getItem('products')); //Json stringini parse ederek objeye çevirdik
+                products.push(product)
+            }
+            localStorage.setItem('products',JSON.stringify(products)); //Objeyi local storage a eklemek için Json objesini string e çevirdik
+        },
+        getProducts: function(product){
+            let products;
+            if(localStorage.getItem('products')=== null){
+                products = []
+            }else{
+                products = JSON.parse(localStorage.getItem('products'));
+            }
+            return products
+        }
+    }
 })();
 
 // async function getCurrentRate() {
-//     const api_key = "c736779b8afe6e31baef21be";
+//     const api_key = "c736779b8afe23fadc46gdca23hbxae31baef21be";
 //     const url = `https://v6.exchangerate-api.com/v6/${api_key}`;
 //     await fetch(url + "/latest/USD")
 //         .then(res => res.json())
@@ -23,7 +44,7 @@ const StorageController = (function () {
 const CurrentRate = (function () {
     return {
         getCurrentRate: function () {
-            const api_key = "your_api_keyyyyyasdasd";
+            const api_key = "c736779b8afe23fadc46gdca23hbxae31baef21be";
             const url = `https://v6.exchangerate-api.com/v6/${api_key}`;
             fetch(url + "/latest/USD", )
                 .then(res => res.json())
@@ -43,16 +64,15 @@ const CurrentRate = (function () {
 //Product Controller
 const ProductController = (function () {
     //Private
-    const Product = function (id, name, price) {
+    const Product = function (id, name, price, manufacturer) {
         this.id = id,
             this.name = name,
-            this.price = price
+            this.price = price,
+            this.manufacturer = manufacturer
     }
 
     const data = {
-        products: [
-            //{id:0,name:'pc',price:1231}
-        ],
+        products: StorageController.getProducts(),
         selectedProduct: null,
         totalPrice: 0
     }
@@ -65,7 +85,7 @@ const ProductController = (function () {
         getData: function () {
             return data
         },
-        addProduct: function (prodName, prodPrice) {
+        addProduct: function (prodName, prodPrice, manufacturer) {
             let id;
 
             if (data.products.length > 0) {
@@ -75,7 +95,7 @@ const ProductController = (function () {
             }
 
             //Aldığımız bilgilerle yeni product nesnesi
-            const newProduct = new Product(id, prodName, parseFloat(prodPrice));
+            const newProduct = new Product(id, prodName, parseFloat(prodPrice), manufacturer);
             data.products.push(newProduct);
             return newProduct;
         },
@@ -109,12 +129,13 @@ const ProductController = (function () {
         getCurrentProduct: function () {
             return data.selectedProduct
         },
-        updateProduct: function (prodName, prodPrice) {
+        updateProduct: function (prodName, prodPrice, prodManufacturer) {
             let product = null;
 
             data.products.forEach(prd => {
                 if (prd.id == data.selectedProduct.id) {
                     prd.name = prodName;
+                    prd.manufacturer = prodManufacturer;
                     prd.price = parseFloat(prodPrice);
                     product = prd;
                 }
@@ -158,7 +179,8 @@ const UIController = (function () {
         totalUSD: "#total-dollar",
         tl: "#tl",
         usd: "#usd",
-        currentRate: ".current-rate"
+        currentRate: ".current-rate",
+        productManufacturer: "#productManufacturer"
 
     }
     return {
@@ -169,6 +191,7 @@ const UIController = (function () {
                 <tr>
                     <td>${prd.id}</td>
                     <td>${prd.name}</td>
+                    <td>${prd.manufacturer}</td>
                     <td>${prd.price}</td>
                     <td class="text-right">
                         <i class="far fa-edit edit-product"></i>
@@ -187,6 +210,7 @@ const UIController = (function () {
                 <tr>
                     <td>${prd.id}</td>
                     <td>${prd.name}</td>
+                    <td>${prd.manufacturer}</td>
                     <td>${prd.price} $</td>
                     <td class="text-right">
                         <i class="far fa-edit edit-product"></i>
@@ -199,6 +223,7 @@ const UIController = (function () {
         clearList: function (name, price) {
             document.querySelector(Selectors.productName).value = '';
             document.querySelector(Selectors.productPrice).value = '';
+            document.querySelector(Selectors.productManufacturer).value = '';
         },
         hideCard: function () {
             document.querySelector(Selectors.productListHide).style.display = 'none';
@@ -213,6 +238,7 @@ const UIController = (function () {
             const selectedProduct = ProductController.getCurrentProduct();
             document.querySelector(Selectors.productName).value = selectedProduct.name;
             document.querySelector(Selectors.productPrice).value = selectedProduct.price;
+            document.querySelector(Selectors.productManufacturer).value = selectedProduct.manufacturer;
         },
         addingState: function (item) {
             UIController.clearList();
@@ -246,7 +272,8 @@ const UIController = (function () {
             items.forEach(item => {
                 if (item.classList.contains('bg-info')) {
                     item.children[1].textContent = prd.name;
-                    item.children[2].textContent = prd.price + ' $';
+                    item.children[2].textContent = prd.manufacturer;
+                    item.children[3].textContent = prd.price + ' $';
                     updatedItem = item;
                 }
             })
@@ -283,7 +310,7 @@ const UIController = (function () {
 
 
 //App Controller (Bizim ana modülümüz)
-const App = (function (ProductCtrl, UICtrl) {
+const App = (function (ProductCtrl, UICtrl, StorageCtrl) {
     const UISelectors = UIController.getSelectors();
 
     //Load Event Listeners
@@ -312,13 +339,19 @@ const App = (function (ProductCtrl, UICtrl) {
 
         const ProdName = document.querySelector(UISelectors.productName).value;
         const ProdPrice = document.querySelector(UISelectors.productPrice).value;
+        const productManufacturer = document.querySelector(UISelectors.productManufacturer).value;
+        
 
         //Adding prod to List
-        if (ProdName != '' && ProdPrice != '') {
+        if (ProdName != '' && ProdPrice != '' && productManufacturer) {
             //Add product
-            const newProduct = ProductCtrl.addProduct(ProdName, ProdPrice);
+            const newProduct = ProductCtrl.addProduct(ProdName, ProdPrice, productManufacturer);
 
             UIController.addProduct(newProduct);
+
+            //Add product to LS
+
+            StorageController.storeProduct(newProduct);
 
             //Get Total
             const total = ProductCtrl.getTotal();
@@ -340,7 +373,7 @@ const App = (function (ProductCtrl, UICtrl) {
 
     const editProductsClick = function (e) {
         if (e.target.classList.contains('edit-product')) {
-            const id = (e.target.parentNode.previousElementSibling.previousElementSibling.previousElementSibling.textContent);
+            const id = (e.target.parentNode.previousElementSibling.previousElementSibling.previousElementSibling.previousElementSibling.textContent);
 
             const product = ProductCtrl.getProductById(id);
 
@@ -360,12 +393,13 @@ const App = (function (ProductCtrl, UICtrl) {
     const editProductsSubmit = function (e) {
         const ProdName = document.querySelector(UISelectors.productName).value;
         const ProdPrice = document.querySelector(UISelectors.productPrice).value;
+        const ProductManufacturer = document.querySelector(UISelectors.productManufacturer).value;
 
         //Adding prod to List
-        if (ProdName != '' && ProdPrice != '') {
+        if (ProdName != '' && ProdPrice != '' && ProductManufacturer != '') {
 
             //Update Product
-            const updatedProduct = ProductCtrl.updateProduct(ProdName, ProdPrice);
+            const updatedProduct = ProductCtrl.updateProduct(ProdName, ProdPrice, ProductManufacturer);
 
             //Update UI
             const item = UICtrl.updateProduct(updatedProduct);
@@ -449,7 +483,7 @@ const App = (function (ProductCtrl, UICtrl) {
             loadEventListeners();
         }
     }
-})(ProductController, UIController);
+})(ProductController, UIController, StorageController);
 
 App.init();
 
