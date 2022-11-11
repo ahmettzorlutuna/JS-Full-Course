@@ -126,7 +126,7 @@ const ProductController = (function () {
                     total += prd.price;
                 }
             });
-
+            
             data.totalPrice = total;
             let formatted = new Intl.NumberFormat().format(data.totalPrice);
 
@@ -178,6 +178,7 @@ const ProductController = (function () {
         }
     }
 })();
+
 
 
 //UI Controller
@@ -378,6 +379,8 @@ const App = (function (ProductCtrl, UICtrl, StorageCtrl) {
             console.log(total)
 
             UICtrl.addingState();
+
+            UIController.addProduct(ageel)
 
             //Show Total
 
