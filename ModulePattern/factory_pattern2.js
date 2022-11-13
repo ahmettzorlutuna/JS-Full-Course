@@ -46,13 +46,13 @@ class Lamborghini {
     }
 }
 
-var car = new Garage();
+var garage = new Garage();
 
-ferrari = car.createNewCar('ferrari');
+ferrari = garage.createNewCar('ferrari');
 ferrari.showMaxSpeed();
 
-lambo = car.createNewCar('lamborghini');
+lambo = garage.createNewCar('lamborghini');
 lambo.showMaxSpeed();
 
-porsche = car.createNewCar('porsche');
+porsche = garage.createNewCar('porsche');
 porsche.showMaxSpeed();

@@ -104,6 +104,7 @@ const ProductController = (function () {
         },
         getData: function () {
             return data
+            
         },
         addProduct: function (prodName, prodPrice, manufacturer) {
             let id;
@@ -514,5 +515,3 @@ const App = (function (ProductCtrl, UICtrl, StorageCtrl) {
 })(ProductController, UIController, StorageController);
 
 App.init();
-
-
